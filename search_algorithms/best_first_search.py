@@ -1,5 +1,5 @@
 import decorators.timer as dtimer
 
 @dtimer.timer(msg="Best First Search")
-def search():
+def search(graph, source, target):
     pass

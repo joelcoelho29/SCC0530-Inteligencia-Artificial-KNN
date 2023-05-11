@@ -25,7 +25,7 @@ def _generate_edges(vertex_list, k):
             distance = math.floor(math.sqrt((x1 - x2)**2 + (y1 - y2)**2)) # Distância geométrica entre os vértices
             distances.append((id2, distance))
         distances.sort(key=lambda x: x[1]) # Ordena as distâncias pelo valor da distância
-        for j in range(k):
-            id2, distance = distances[j]
+        for l in range(k):
+            id2, distance = distances[l]
             edge_list.append((id1, id2, distance)) # Cria uma aresta com o vértice mais próximo
     return edge_list
