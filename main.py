@@ -1,25 +1,27 @@
-import search_algorithms.depth_search as depth
-import search_algorithms.a_star_search as astar
-import search_algorithms.best_first_search as bestfirst
-import search_algorithms.breadth_first_search as breadhfirst
-import knn.knn_nx
-import knn.generate_knn
-import knn.plot_knn
+from knn.generate_knn import generate
+from knn.plot_knn import plot
 
-n = 50
-k = 5
+from graph import Graph
 
-knn_vertex_list, knn_edge_list = knn.generate_knn.generate(n, k)
+n = 20
+k = 2
 
-G = knn.knn_nx.convert(knn_vertex_list, knn_edge_list)
+knn_vertex_list, knn_edge_list = generate(n, k)
 
-#knn.plot_knn.plot(G)
-#knn.plot_knn.plot(knn_vertex_list, knn_edge_list)
+g = Graph()
+
+for vertex in knn_vertex_list:
+   g.add_vertex(vertex[0])
+
+for edge in knn_edge_list:
+    g.add_edge(edge[0], edge[1], edge[2])
 
 source = 1
-target = 49
+target = 9
 
-depth.search(G, source, target)
-astar.search(G, source, target)
-bestfirst.search(G, source, target)
-breadhfirst.search(G, source, target)
+print(g.bfs(source, target))
+print(g.dfs(source, target))
+print(g.a_star(source, target))
+print(g.best_first(source, target))
+
+plot(knn_vertex_list, knn_edge_list)

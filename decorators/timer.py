@@ -6,7 +6,7 @@ def timer(msg):
             start = time.time()
             result = func(*args, **kwargs)
             end = time.time()
-            print("Tempo de execucao", msg, ":", end - start)
+            print("\nTempo de execucao", msg, ":", end - start)
             return result
         return wrapper
     return decorator
