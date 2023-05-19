@@ -28,54 +28,46 @@ class Graph:
             return self.graph[vertex1][vertex2]
         else:
             return None
-    
+
     @timer(msg="Depth First Search")
     def dfs(self, start_vertex, target_vertex):
         visited = set()
-        path = list()
-        total_weight = 0
-        stack = [(start_vertex, 0)]
+        stack = [(start_vertex, [start_vertex], 0)]
 
         while stack:
-            current_vertex, weight = stack.pop()
-            total_weight += weight
-            path.append(current_vertex)
+            current_vertex, path, weight = stack.pop()
 
             if current_vertex == target_vertex:
-                return (path, total_weight)
+                return (path, weight)
 
             visited.add(current_vertex)
             neighbors = self.get_neighbors(current_vertex)
 
             for neighbor in neighbors:
                 if neighbor not in visited:
-                    stack.append((neighbor, self.get_weight(current_vertex, neighbor)))
+                    stack.append((neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
 
         return None
     
     @timer(msg="Breadth First Search")
     def bfs(self, start_vertex, target_vertex):
         visited = set()
-        path = list()
-        total_weight = 0
         queue = deque()
 
-        queue.append((start_vertex, 0))
+        queue.append((start_vertex, [start_vertex], 0))
         visited.add(start_vertex)
 
         while queue:
-            current_vertex, weight = queue.popleft()
-            total_weight += weight
-            path.append(current_vertex)
+            current_vertex, path, weight = queue.popleft()
 
             if current_vertex == target_vertex:
-                return (path, total_weight)
+                return (path, weight)
 
             neighbors = self.get_neighbors(current_vertex)
             
             for neighbor in neighbors:
                 if neighbor not in visited:
-                    queue.append((neighbor, self.get_weight(current_vertex, neighbor)))
+                    queue.append((neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
                     visited.add(neighbor)
 
         return None
