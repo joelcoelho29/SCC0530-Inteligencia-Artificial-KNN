@@ -1,6 +1,8 @@
 import random
 import math
 
+from decorators.timer import timer
+
 def generate(n, k):
     vertex_list = _generate_vertices(n)
     edge_list = _generate_edges(vertex_list, k)
@@ -15,6 +17,7 @@ def _generate_vertices(n):
         vertex_list.append((i, x, y)) # Cada vértice é representado por uma tupla com id, x e y
     return vertex_list
 
+@timer(msg="_generate_edges")
 def _generate_edges(vertex_list, k):
     edge_list = []
     for i, (id1, x1, y1) in enumerate(vertex_list):
