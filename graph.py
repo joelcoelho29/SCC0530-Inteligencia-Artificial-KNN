@@ -48,7 +48,7 @@ class Graph:
             current_vertex, path, weight = stack.pop()
 
             if current_vertex == target_vertex:
-                return (path, weight)
+                return (path, weight, len(visited))
 
             visited.add(current_vertex)
             neighbors = self.get_neighbors(current_vertex)
@@ -73,7 +73,7 @@ class Graph:
             current_vertex, path, weight = queue.popleft()
 
             if current_vertex == target_vertex:
-                return (path, weight)
+                return (path, weight, len(visited))
 
             neighbors = self.get_neighbors(current_vertex)
 
@@ -108,7 +108,7 @@ class Graph:
             visited.add(current_vertex)
 
             if current_vertex == target_vertex:
-                return (current_path, weight)
+                return (current_path, weight, len(visited))
 
             neighbors = self.get_neighbors(current_vertex)
 
@@ -118,7 +118,7 @@ class Graph:
                     new_cost = self.get_weight(current_vertex, neighbor)
 
                     if (neighbor == target_vertex):
-                        return (new_path, weight + new_cost)
+                        return (new_path, weight + new_cost, len(visited))
                     
                     heuristic = self.heuristic(
                         current_vertex, neighbor, target_vertex, is_euclidian_heuristic)
