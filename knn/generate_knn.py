@@ -1,5 +1,6 @@
 import random
 import math
+from scipy.spatial import KDTree
 
 from decorators.timer import timer
 
@@ -20,15 +21,19 @@ def _generate_vertices(n):
 @timer(msg="_generate_edges")
 def _generate_edges(vertex_list, k):
     edge_list = []
+    # Cria a lista de coordenadas para a kd-tree
+    coordinates = [(x, y) for _, x, y in vertex_list]
+    
+    # Cria a kd-tree
+    kd_tree = KDTree(coordinates)
+    
     for i, (id1, x1, y1) in enumerate(vertex_list):
-        distances = []
-        for j, (id2, x2, y2) in enumerate(vertex_list):
-            if i == j: # Não cria aresta consigo mesmo
-                continue
+        # Realiza a busca na kd-tree pelo k+1 vizinhos mais próximos (incluindo o próprio vértice)
+        distances, indices = kd_tree.query([(x1, y1)], k=k+1)
+        
+        for j in indices[0][1:]:
+            id2, x2, y2 = vertex_list[j]
             distance = math.floor(math.sqrt((x1 - x2)**2 + (y1 - y2)**2)) # Distância geométrica entre os vértices
-            distances.append((id2, distance))
-        distances.sort(key=lambda x: x[1]) # Ordena as distâncias pelo valor da distância
-        for l in range(k):
-            id2, distance = distances[l]
             edge_list.append((id1, id2, distance)) # Cria uma aresta com o vértice mais próximo
+    
     return edge_list
