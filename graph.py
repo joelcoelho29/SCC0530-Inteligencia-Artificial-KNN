@@ -2,6 +2,8 @@ from collections import deque
 
 from decorators.timer import timer
 
+from queue import PriorityQueue
+
 class Graph:
     def __init__(self):
         self.graph = {}
@@ -77,5 +79,27 @@ class Graph:
         pass
 
     @timer(msg="Best First")
-    def best_first(self, start_vertex, target_vertex):
-        pass
+    def best_first(self,  start, goal):
+        current_path = [(start, 0)]
+        frontier = PriorityQueue()
+        frontier.put((0, current_path))
+
+        while not frontier.empty():
+            _, current_path = frontier.get()
+            current_vertex, current_cost = current_path[-1]
+
+            if current_vertex == goal:
+                return current_path
+
+            neighbors = self.get_neighbors(current_vertex)
+
+            for neighbor in neighbors:
+                new_cost = current_cost + self.get_weight(current_vertex, neighbor)
+                new_path = current_path + [(neighbor, new_cost)]
+                priority = self.heuristic(neighbor, goal)
+                frontier.put((priority, new_path))
+
+        return None
+
+    def heuristic(self, vertex, goal):
+        return self.get_weight(vertex, goal)
