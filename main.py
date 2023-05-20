@@ -3,8 +3,8 @@ from knn.plot_knn import plot
 
 from graph import Graph
 
-n = 20
-k = 2
+n = 6
+k = 3
 
 knn_vertex_list, knn_edge_list = generate(n, k)
 
@@ -17,11 +17,12 @@ for edge in knn_edge_list:
     g.add_edge(edge[0], edge[1], edge[2])
 
 source = 1
-target = 9
+target = 4
 
-print(g.bfs(source, target))
-print(g.dfs(source, target))
-print(g.a_star(source, target))
-print(g.best_first(source, target))
+
+#print(g.bfs(source, target))
+#print(g.dfs(source, target))
+#print(g.a_star(source, target))
+g.best_first(source, target)
 
 plot(knn_vertex_list, knn_edge_list)

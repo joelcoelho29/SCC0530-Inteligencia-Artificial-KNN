@@ -76,6 +76,36 @@ class Graph:
     def a_star(self, start_vertex, target_vertex):
         pass
 
+
+
+
     @timer(msg="Best First")
     def best_first(self, start_vertex, target_vertex):
-        pass
+        visited_nodes = set()
+        priority_queue = []
+        priority_queue.append((0, start_vertex))    #startando a fila de prioridade com (0, vértice inicial)
+
+        while priority_queue:
+            priority, current_node = priority_queue.pop(0)
+
+            print("Percorrendo o nó:", current_node)
+
+            if current_node == target_vertex:
+                print("Chegou no caminho final :)")
+                return True
+
+            visited_nodes.add(current_node)
+
+            neighbors = self.get_neighbors(current_node)
+  
+            neighbors = [(self.get_weight(current_node, neighbor), neighbor) for neighbor in neighbors]
+
+            neighbors.sort(key = lambda x: x[0], reverse=True)
+
+            for neighbor_priority, neighbor in neighbors:
+                if neighbor not in visited_nodes:
+                    priority_queue.insert(0, (neighbor_priority, neighbor))
+
+        print("Caminho final não encontrado :(")
+        return False
+
