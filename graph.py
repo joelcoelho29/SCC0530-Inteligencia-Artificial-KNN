@@ -1,36 +1,46 @@
+import math
+from decorators.timer import timer
+from queue import PriorityQueue
 from collections import deque
 
-from decorators.timer import timer
 
 class Graph:
     def __init__(self):
         self.graph = {}
+        self.vertex = {}
 
+    # Função auxiliar responsável por adicionar um vértice no gráfico
     def add_vertex(self, vertex):
         if vertex not in self.graph:
-            self.graph[vertex] = {}
+            vertex_id = vertex[0]
+            self.vertex[vertex_id] = (vertex[1], vertex[2])
+            self.graph[vertex_id] = {}
 
+    # Função auxiliar responsável por adicionar uma aresta no gráfico
     def add_edge(self, vertex1, vertex2, weight):
         if vertex1 in self.graph and vertex2 in self.graph:
             self.graph[vertex1][vertex2] = weight
             self.graph[vertex2][vertex1] = weight
 
+    # Função auxiliar reponsável por obter uma lista que contém todos os vértices vizinhos do vértice parametrizado
     def get_neighbors(self, vertex):
         if vertex in self.graph:
             return list(self.graph[vertex].keys())
         else:
             return []
 
-    def get_weight(self, vertex1, vertex2):
-        if vertex1 in self.graph and vertex2 in self.graph[vertex1]:
-            if (vertex1 == vertex2):
+    # Função auxiliar reponsável por calcular e retornar o peso entre dois vértices
+    def get_weight(self, source, target):
+        if source in self.graph and target in self.graph[source]:
+            if (source == target):
                 return 0
-            return self.graph[vertex1][vertex2]
+            return self.graph[source][target]
         else:
             return None
 
-    @timer(msg="Depth First Search")
-    def dfs(self, start_vertex, target_vertex):
+    # Função responsável por executar o algoritmo Depth First Search
+    @timer(msg="(DFS) Depth First Search")
+    def depth_first_search(self, start_vertex, target_vertex):
         visited = set()
         stack = [(start_vertex, [start_vertex], 0)]
 
@@ -45,12 +55,14 @@ class Graph:
 
             for neighbor in neighbors:
                 if neighbor not in visited:
-                    stack.append((neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
+                    stack.append(
+                        (neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
 
         return None
-    
-    @timer(msg="Breadth First Search")
-    def bfs(self, start_vertex, target_vertex):
+
+    # Função responsável por executar o algoritmo Breadth First Search
+    @timer(msg="(BFS) Breadth First Search")
+    def breadth_first_search(self, start_vertex, target_vertex):
         visited = set()
         queue = deque()
 
@@ -64,18 +76,77 @@ class Graph:
                 return (path, weight)
 
             neighbors = self.get_neighbors(current_vertex)
-            
+
             for neighbor in neighbors:
                 if neighbor not in visited:
-                    queue.append((neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
+                    queue.append(
+                        (neighbor, path + [neighbor], self.get_weight(current_vertex, neighbor) + weight))
                     visited.add(neighbor)
 
         return None
-    
-    @timer(msg="A*")
-    def a_star(self, start_vertex, target_vertex):
-        pass
 
-    @timer(msg="Best First")
+    # Função responsável por executar o algoritmo A*
+    @timer(msg="(A*) A*")
+    def a_star(self, start_vertex, target_vertex):
+        return self.actual_best_first(start_vertex, target_vertex, True)
+
+    # Função responsável por executar o algoritmo Best First Search
+    @timer(msg="(BF) Best First")
     def best_first(self, start_vertex, target_vertex):
-        pass
+        return self.actual_best_first(start_vertex, target_vertex, False)
+
+    def actual_best_first(self, start_vertex, target_vertex, is_euclidian_heuristic):
+        visited = set()
+        current_path = [start_vertex]
+        frontier = PriorityQueue()
+        frontier.put((0, current_path, 0))
+
+        while not frontier.empty():
+            _, current_path, weight = frontier.get()
+            current_vertex = current_path[-1]
+
+            visited.add(current_vertex)
+
+            if current_vertex == target_vertex:
+                return (current_path, weight)
+
+            neighbors = self.get_neighbors(current_vertex)
+
+            for neighbor in neighbors:
+                if neighbor not in visited:
+                    new_path = current_path + [neighbor]
+                    new_cost = self.get_weight(current_vertex, neighbor)
+
+                    if (neighbor == target_vertex):
+                        return (new_path, weight + new_cost)
+                    
+                    heuristic = self.heuristic(
+                        current_vertex, neighbor, target_vertex, is_euclidian_heuristic)
+                    frontier.put((heuristic, new_path, weight + new_cost))
+
+        return None
+
+    # Função auxiliar responsável determinar a heurística no método A*
+    # OBS: Vale ressaltar que essa função é utilizada tanto pelo BF quanto pelo A*, o que difere é um boolean (is_euclidian_heuristic) que determina qual será a heurística que deve ser utilizada
+    def heuristic(self, source, neighbor, target, is_euclidian_heuristic):
+        if is_euclidian_heuristic:
+            x1, y1 = self.vertex[neighbor]
+            x2, y2 = self.vertex[target]
+
+            return math.floor(math.sqrt((x2 - x1)**2 + (y2 - y1)**2))
+
+        return self.get_weight(source, neighbor)
+
+    # Função auxiliar responsável por dispor no terminal o caminho retornado pelos algoritmos de busca
+    def print_path(self, path):
+        if (path == None):
+            print(f"Path not found :(")
+            return
+
+        print(f"Path: ", end='')
+
+        for vertex in path:
+            if (path.index(vertex) == len(path) - 1):
+                print(f"{vertex}\n")
+            else:
+                print(f"{vertex} -> ", end='')
