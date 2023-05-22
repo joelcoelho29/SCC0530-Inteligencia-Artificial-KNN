@@ -2,7 +2,7 @@ import math
 from decorators.timer import timer
 from queue import PriorityQueue
 from collections import deque
-
+import heapq
 
 class Graph:
     def __init__(self):
@@ -125,6 +125,51 @@ class Graph:
                     frontier.put((heuristic, new_path, weight + new_cost))
 
         return None
+
+    @timer(msg="Dijkstra")
+    def dijkstra(self, start_vertex, target_vertex):
+        distances = {vertex: float('inf') for vertex in self.graph}
+        previous = {vertex: None for vertex in self.graph}
+        visited_nodes = 0  # Variável para contar o número de nós visitados
+        
+        distances[start_vertex] = 0
+        
+        pq = [(0, start_vertex)]
+        
+        while pq:
+            current_distance, current_vertex = heapq.heappop(pq)
+            
+            if current_distance > distances[current_vertex]:
+                continue
+            
+            visited_nodes += 1
+            
+            if current_vertex == target_vertex:
+                break
+            
+            for neighbor in self.get_neighbors(current_vertex):
+                new_distance = distances[current_vertex] + self.get_weight(current_vertex, neighbor)
+                
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current_vertex
+                    heapq.heappush(pq, (new_distance, neighbor))
+        
+        path = self._reconstruct_path(start_vertex, target_vertex, previous)
+        
+        total_weight = distances[target_vertex]
+        
+        return path, total_weight, visited_nodes
+
+    # Função auxiliar para reconstruir o caminho percorrido
+    def _reconstruct_path(self, start_vertex, target_vertex, previous):
+        path = []
+        current_vertex = target_vertex
+        while current_vertex is not None:
+            path.append(current_vertex)
+            current_vertex = previous[current_vertex]
+        path.reverse()
+        return path
 
     # Função auxiliar responsável determinar a heurística no método A*
     # OBS: Vale ressaltar que essa função é utilizada tanto pelo BF quanto pelo A*, o que difere é um boolean (is_euclidian_heuristic) que determina qual será a heurística que deve ser utilizada
