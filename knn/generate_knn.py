@@ -10,12 +10,22 @@ def generate(n, k):
 
     return vertex_list, edge_list
 
+
 def _generate_vertices(n):
     vertex_list = []
+    coordinates_set = set()
+    
     for i in range(n):
         x = math.floor(random.uniform(0, n))
         y = math.floor(random.uniform(0, n))
-        vertex_list.append((i, x, y)) # Cada vértice é representado por uma tupla com id, x e y
+        
+        while (x, y) in coordinates_set:
+            x = math.floor(random.uniform(0, n))
+            y = math.floor(random.uniform(0, n))
+        
+        coordinates_set.add((x, y))
+        vertex_list.append((i, x, y))
+        
     return vertex_list
 
 @timer(msg="_generate_edges")
