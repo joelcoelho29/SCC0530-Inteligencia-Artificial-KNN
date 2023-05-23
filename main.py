@@ -41,9 +41,9 @@ def execute_search_method(method, source, target):
     search_result = method(source, target)
     end = time.time()
     runtime = round(end - start, 3)
-    if (search_result[0] == None):
+    if (search_result == None or search_result[0] == None or search_result[1] == None or search_result[2] == None):
         graph.print_path(None)
-        return (0, runtime)
+        return (0, runtime, 0)
 
     graph.print_path(search_result[0])
     return (search_result[1], runtime, search_result[2])
@@ -96,7 +96,7 @@ def execute(vertices_pairs):
 
 
 # Definição do número total de vértices e da quantidade de conexõs entre os mesmos
-n = 500
+n = 2000
 k = 3
 
 # Função responsável por gerar uma lista de vértices e uma lista de arestas de forma randômica
@@ -113,4 +113,4 @@ vertices_pairs = create_random_vertices()
 execute(vertices_pairs)
 
 # Plotando o gráfico
-#plot(knn_vertex_list, knn_edge_list)
+plot(knn_vertex_list, knn_edge_list)
